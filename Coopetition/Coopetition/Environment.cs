@@ -133,7 +133,7 @@ namespace Coopetition
             {
                 Task task = new Task(i);
                 TaskPool.Add(task);
-                FillTaskTable(i, task);
+                FillTaskTable(i, task); // adds a row of task[i] to dtTaskInitialValues
             }
 
             // Generate communities
@@ -163,7 +163,7 @@ namespace Coopetition
 
                 community.AddMember(ws);
                 ws.CommunityId = community.Id;
-                FillWsTable(i, ws);
+                FillWsTable(i, ws); // adds ws to dtWsInitialValues
             }
 
             Communities.Add(community);
