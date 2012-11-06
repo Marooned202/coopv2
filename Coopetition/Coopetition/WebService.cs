@@ -211,60 +211,75 @@ namespace Coopetition
                             {
                                 this.taskPortionDone = 1;
                                 Thread.Sleep(5);
-                                double rndQoS = Math.Max(0, this.qos - (Math.Round(rnd.NextDouble(), 4) / Constants.QoSVarianceModifier));
+                                double rndQoS = generateProvidedQoS();
 
                                 this.providedQoS = rndQoS;
                                 this.hasCollaborated = false;
                                 resultQoS = this.providedQoS;
 
                                 community.Members[this.id].NumberOfTasksDone++;
-                                this.budget += task.Fee; // Should be changed based on the provided QoS
-                                this.totalIncome += task.Fee;
+
+                                if (task.QoS < this.providedQoS + 0.05)
+                                {
+                                    this.budget += task.Fee; // Should be changed based on the provided QoS
+                                    this.totalIncome += task.Fee;
+                                }
                             }
                         }
                         else
                         {
                             this.taskPortionDone = 1;
                             Thread.Sleep(5);
-                            double rndQoS = Math.Max(0, this.qos - (Math.Round(rnd.NextDouble(), 4) / Constants.QoSVarianceModifier));
+                            double rndQoS = generateProvidedQoS();
 
                             this.providedQoS = rndQoS;
                             this.hasCollaborated = false;
                             resultQoS = this.providedQoS;
 
                             community.Members[this.id].NumberOfTasksDone++;
-                            this.budget += task.Fee; // Should be changed based on the provided QoS
-                            this.totalIncome += task.Fee;
+
+                            if (task.QoS < this.providedQoS + 0.05)
+                            {
+                                this.budget += task.Fee; // Should be changed based on the provided QoS
+                                this.totalIncome += task.Fee;
+                            }
                         }
                     }
                     else
                     {
                         this.taskPortionDone = 1;
                         Thread.Sleep(5);
-                        double rndQoS = Math.Max(0, this.qos - (Math.Round(rnd.NextDouble(), 4) / Constants.QoSVarianceModifier));
+                        double rndQoS = generateProvidedQoS();
 
                         this.providedQoS = rndQoS;
                         this.hasCollaborated = false;
                         resultQoS = this.providedQoS;
 
                         community.Members[this.id].NumberOfTasksDone++;
-                        this.budget += task.Fee; // Should be changed based on the provided QoS
-                        this.totalIncome += task.Fee;
+
+                        if (task.QoS < this.providedQoS + 0.05)
+                        {
+                            this.budget += task.Fee; // Should be changed based on the provided QoS
+                            this.totalIncome += task.Fee;
+                        }
                     } 
                 }
                 else if (this.type == Constants.WebserviceType.JustCompetitive)
                 {
                     this.taskPortionDone = 1;
                     Thread.Sleep(5);
-                    double rndQoS = Math.Max(0, this.qos - (Math.Round(rnd.NextDouble(), 4) / Constants.QoSVarianceModifier));
+                    double rndQoS = generateProvidedQoS();
 
                     this.providedQoS = rndQoS;
                     this.hasCollaborated = false;
                     resultQoS = this.providedQoS;
 
                     community.Members[this.id].NumberOfTasksDone++;
-                    this.budget += task.Fee; // Should be changed based on the provided QoS
-                    this.totalIncome += task.Fee;
+                    if (task.QoS < this.providedQoS + 0.05)
+                    {
+                        this.budget += task.Fee; // Should be changed based on the provided QoS
+                        this.totalIncome += task.Fee;
+                    }
                 }
             }
         }
@@ -279,7 +294,7 @@ namespace Coopetition
             this.taskPortionDone = rndPortion; // main web service task portion
             cm.Members[this.id].NumberOfTasksDone++;
             Thread.Sleep(5);
-            double rndQoS = Math.Max(0, this.qos - (Math.Round(rnd.NextDouble(), 4) / Constants.QoSVarianceModifier));
+            double rndQoS = generateProvidedQoSCollabrative();
             this.providedQoS = rndQoS;
             this.budget += (int)((1 - Constants.CooperationFeePercentage) * task.Fee);
             this.totalIncome += (int)((1 - Constants.CooperationFeePercentage) * task.Fee);
@@ -324,6 +339,18 @@ namespace Coopetition
             collaborativeMemberIds = collaborativeMemberIds.TrimEnd(charsToRemove);
             Environment.outputLog.AppendText("Web service " + this.id + " Cooperates with " + collaborativeMemberIds + "\n");
             this.providedQoS = (Constants.ResponsibleWSQoSPortion * this.providedQoS) + ((1 - Constants.ResponsibleWSQoSPortion) * networkQoS); // main web service provided QoS (provided QoS for the task)
+        }
+
+        public double generateProvidedQoS()
+        {
+            Random rnd = new Random(DateTime.Now.Millisecond);
+            return Math.Max(0, this.qos - (Math.Round(rnd.NextDouble(), 4) / Constants.QoSVarianceModifier) + (1 / (2 * Constants.QoSVarianceModifier)));
+        }
+
+        public double generateProvidedQoSCollabrative()
+        {
+            Random rnd = new Random(DateTime.Now.Millisecond);
+            return Math.Min(1, Math.Max(0, this.qos - (Math.Round(rnd.NextDouble(), 4) / Constants.QoSVarianceModifier) + ((Constants.QoSVarianceModifier/2) / (1 * Constants.QoSVarianceModifier))));
         }
 
     }

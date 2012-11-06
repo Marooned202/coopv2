@@ -169,6 +169,8 @@ namespace Coopetition
            // UpdateMemberlist();
             List<WebServiceInfo> competitiveMembers = members.FindAll(delegate(WebServiceInfo wsInfo) { return wsInfo.Webservice.ReadyToCompete == true; });
 
+            Environment.outputLog.AppendText("Sorting Tasks: " + taskPool.Count);
+
             SortTaskPool(taskPool, "QoS");
             if (competitiveMembers.Count < 1)
             {
@@ -177,7 +179,7 @@ namespace Coopetition
             }
             Random rnd = new Random(DateTime.Now.Millisecond);
             //int numberOfTasksToBeDone = rnd.Next(1, competitiveMembers.Count);
-            int numberOfTasksToBeDone = rnd.Next(1, Constants.MaxNumberOfTasksPerRun);
+            int numberOfTasksToBeDone = rnd.Next(Constants.MinNumberOfTasksPerRun, Constants.MaxNumberOfTasksPerRun);
 
             int numberOfAcceptingMembers = (int)Math.Ceiling(Constants.AcceptanceProbability * competitiveMembers.Count);
             int numberOfRejectingMembers = competitiveMembers.Count - numberOfAcceptingMembers;
@@ -210,27 +212,52 @@ namespace Coopetition
             {
                 competitiveIndices.Add(competitiveMembers[i].Webservice.Id);
             }
+            /*
             for (int i = 0; i < numberOfTasksToBeAssigned; i++)
             {
                 int index = rnd.Next(0, competitiveIndices.Count);
                 indices[i] = competitiveIndices[index];
                 competitiveIndices.RemoveAt(index);
             }
+            */
+
+            
 
             // Assigns tasks
             for (int i = 0; i < numberOfTasksToBeAssigned; i++)
             {
-                notAssignedTasks[i].Assigned = true;
-                WebServiceInfo wsInfo = competitiveMembers.Find(delegate(WebServiceInfo winfo) { return winfo.Webservice.Id == indices[i]; });
-                if (wsInfo.Webservice.Reputation >= Constants.ReputationThreshold)
+                // Finding highest growsthfactor or reputation that has task qos
+                double maxGrowthFactor = 0;
+                int maxGrowthFactorIndex = -1;
+                for (int k = 0; k < competitiveMembers.Count;k++)
                 {
-                    wsInfo.NumberOfOfferedTasks++;
-                    wsInfo.CurrentIfOfferedTask = true;
-                    wsInfo.NumberOfAcceptedTasks++;
-                    wsInfo.CurrentIfAcceptedTask = true;
-                    wsInfo.CurrentAssignedTask = notAssignedTasks[i];
-                    Environment.outputLog.AppendText(" " + wsInfo.Webservice.Id + " ");
-                    k = i;
+                    if ((competitiveMembers[k].Webservice.QoS > notAssignedTasks[i].QoS + 0.01) &&
+                        competitiveMembers[k].Webservice.GrowthFactor > maxGrowthFactor)
+                    {
+                        maxGrowthFactor = competitiveMembers[k].Webservice.GrowthFactor;
+                        maxGrowthFactorIndex = k;
+                    }
+                }
+
+                if (k == -1)
+                { // No sebservice has the QoS needed for the job so we are dismissing the task
+                    notAssignedTasks[i].Assigned = true;
+                }
+                else
+                {
+                    notAssignedTasks[i].Assigned = true;
+                    //WebServiceInfo wsInfo = competitiveMembers.Find(delegate(WebServiceInfo winfo) { return winfo.Webservice.Id == indices[i]; });
+                    WebServiceInfo wsInfo = competitiveMembers.Find(delegate(WebServiceInfo winfo) { return winfo.Webservice.Id == maxGrowthFactorIndex; });
+                    if (wsInfo.Webservice.Reputation >= Constants.ReputationThreshold)
+                    {
+                        wsInfo.NumberOfOfferedTasks++;
+                        wsInfo.CurrentIfOfferedTask = true;
+                        wsInfo.NumberOfAcceptedTasks++;
+                        wsInfo.CurrentIfAcceptedTask = true;
+                        wsInfo.CurrentAssignedTask = notAssignedTasks[i];
+                        Environment.outputLog.AppendText(" " + wsInfo.Webservice.Id + " ");
+                        k = i;
+                    }
                 }
             }
 

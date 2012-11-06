@@ -134,6 +134,8 @@ namespace Coopetition
                 Task task = new Task(i);
                 TaskPool.Add(task);
                 FillTaskTable(i, task); // adds a row of task[i] to dtTaskInitialValues
+                Thread.Sleep(5);
+                //outputLog.AppendText("Task: " + task.QoS + ", fee: " + task.Fee + "\n");
             }
 
             // Generate communities

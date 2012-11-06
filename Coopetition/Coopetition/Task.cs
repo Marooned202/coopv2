@@ -47,7 +47,8 @@ namespace Coopetition
             Thread.Sleep(5);
             double q = Math.Round(rnd.NextDouble(), 4);
             qos = Constants.TaskQoS_LowerBound + (Constants.TaskQoS_UpperBound - Constants.TaskQoS_LowerBound) * q;        
-            fee = rnd.Next(Constants.TaskFee_LowerBound, Constants.TaskFee_UpperBound);
+            //fee = rnd.Next(Constants.TaskFee_LowerBound, Constants.TaskFee_UpperBound);
+            fee = Constants.TaskFee_LowerBound + (int)((Constants.TaskFee_UpperBound - Constants.TaskFee_LowerBound) * ((qos - Constants.TaskQoS_LowerBound) / (Constants.TaskQoS_UpperBound - Constants.TaskQoS_LowerBound)));
             assigned = false;
         }
     }
