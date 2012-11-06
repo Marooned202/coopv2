@@ -120,7 +120,7 @@ namespace Coopetition
 
         public void Initialization(Constants.SimulationType simulationType)
         {
-            CreateInitializationTables(); // Adding coloumns to drWsInitialValues
+            CreateInitializationTables(); // Adding coloumns titles to drWsInitialValues
 
             DataSetTools dsTools = new DataSetTools();
             dataSet = dsTools.parseDateSet("c:\\projects\\QWS_Dataset_v2.txt"); // Gather all dataset webservice metrics and QoS
