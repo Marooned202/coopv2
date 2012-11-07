@@ -212,14 +212,14 @@ namespace Coopetition
             {
                 competitiveIndices.Add(competitiveMembers[i].Webservice.Id);
             }
-            /*
+            
             for (int i = 0; i < numberOfTasksToBeAssigned; i++)
             {
                 int index = rnd.Next(0, competitiveIndices.Count);
                 indices[i] = competitiveIndices[index];
                 competitiveIndices.RemoveAt(index);
             }
-            */
+            
 
             
 
@@ -229,25 +229,32 @@ namespace Coopetition
                 // Finding highest growsthfactor or reputation that has task qos
                 double maxGrowthFactor = 0;
                 int maxGrowthFactorIndex = -1;
-                for (int k = 0; k < competitiveMembers.Count;k++)
-                {
-                    if ((competitiveMembers[k].Webservice.QoS > notAssignedTasks[i].QoS + 0.01) &&
-                        competitiveMembers[k].Webservice.GrowthFactor > maxGrowthFactor)
+                for (int l = 0; l < competitiveMembers.Count;l++)
+                {                                       
+                    if ((competitiveMembers[l].CurrentIfAcceptedTask == false) &&
+                        (competitiveMembers[l].Webservice.QoS > notAssignedTasks[i].QoS + 0.01) &&
+                        competitiveMembers[l].Webservice.GrowthFactor > maxGrowthFactor)
                     {
-                        maxGrowthFactor = competitiveMembers[k].Webservice.GrowthFactor;
-                        maxGrowthFactorIndex = k;
+                        maxGrowthFactor = competitiveMembers[l].Webservice.GrowthFactor;
+                        maxGrowthFactorIndex = l;
                     }
                 }
 
-                if (k == -1)
-                { // No sebservice has the QoS needed for the job so we are dismissing the task
+                if (competitiveMembers[0].Webservice.Type == Constants.WebserviceType.JustCompetitive || competitiveMembers[0].Webservice.Type == Constants.WebserviceType.Random)
+                    maxGrowthFactorIndex = 1; //Somthing Irrevelant
+
+                if (maxGrowthFactorIndex == -1)
+                { // No sebservice has the QoS needed for the task so we are dismissing the task i
                     notAssignedTasks[i].Assigned = true;
                 }
                 else
                 {
                     notAssignedTasks[i].Assigned = true;
-                    //WebServiceInfo wsInfo = competitiveMembers.Find(delegate(WebServiceInfo winfo) { return winfo.Webservice.Id == indices[i]; });
-                    WebServiceInfo wsInfo = competitiveMembers.Find(delegate(WebServiceInfo winfo) { return winfo.Webservice.Id == maxGrowthFactorIndex; });
+                    WebServiceInfo wsInfo;
+                    if (competitiveMembers[0].Webservice.Type == Constants.WebserviceType.JustCompetitive || competitiveMembers[0].Webservice.Type == Constants.WebserviceType.Random)
+                        wsInfo = competitiveMembers.Find(delegate(WebServiceInfo winfo) { return winfo.Webservice.Id == indices[i]; });
+                    else
+                        wsInfo = competitiveMembers[maxGrowthFactorIndex];
                     if (wsInfo.Webservice.Reputation >= Constants.ReputationThreshold)
                     {
                         wsInfo.NumberOfOfferedTasks++;
@@ -297,7 +304,7 @@ namespace Coopetition
             {
                 
                 CollaborationNetwork wsnetwork = this.intraNetworks.Find(delegate(CollaborationNetwork net) { return net.Id == wsInfo.Webservice.NetworkId; });
-                
+
                 if (wsInfo.CurrentIfOfferedTask)
                 {
                     if (wsInfo.CurrentIfAcceptedTask)
@@ -384,6 +391,18 @@ namespace Coopetition
                         //    }
                         //}
                     }
+                }
+                else // no task offered 
+                {
+                    if (wsInfo.Webservice.Type == Constants.WebserviceType.Coopetitive) 
+                    {
+                    } 
+                    else 
+                    {
+                        Random rnd = new Random();                        
+                        wsInfo.Webservice.Reputation -= Constants.reputationDecay * rnd.NextDouble();
+                    }
+                    
                 }
 
             }

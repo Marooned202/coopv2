@@ -33,6 +33,12 @@ namespace Coopetition
         public static List<double> rewardChance5 = new List<double>();
         public static List<double> rewardChance10 = new List<double>();
         public static List<double> rewardChance15 = new List<double>();
+        public static List<double> totalRunTaskQoS = new List<double>();
+        public static List<double> totalRunTaskNumber = new List<double>();
+        public static List<double> avergaeProvidedTaskQoS = new List<double>();
+
+        public static List<double> numberOfTaskSatisfied = new List<double>();
+        public static List<double> ratioOfTaskSatisfied = new List<double>();
 
         public static int row = 1;
         public static int col = 1;
@@ -247,7 +253,7 @@ namespace Coopetition
             {
                 if ((simulationType == Constants.SimulationType.Coopetitive || simulationType == Constants.SimulationType.AllRandom))
                 {
-                    int NetworkSize = (community.Members.Count - 3) / Constants.NumberOfNetworksInCommunity;
+                    int NetworkSize = (community.Members.Count - 1) / Constants.NumberOfNetworksInCommunity;
                     Environment.outputLog.AppendText("NetworkSize: " + NetworkSize + "\n");
                     Environment.outputLog.AppendText("Member Count: " + community.Members.Count + "\n");
                     for (int i = 0; i < Constants.NumberOfNetworksInCommunity; i++)
@@ -337,7 +343,10 @@ namespace Coopetition
                 for (int i = 0; i < cm.Members.Count; i++)
                 {
                     Community.WebServiceInfo wsInfo = cm.Members[i];
+
                     wsInfo.Webservice.Budget -= Constants.MembershipFee;
+                    if (wsInfo.Webservice.Budget < 0) wsInfo.Webservice.Budget = 0;
+
                     // Checking growth factor by web services
                     wsInfo.Webservice.CoopetitionDecision(wsInfo.NumberOfTasksDone, numberOfRun);
                     // Insert CommunityId to the excel file 
@@ -452,6 +461,34 @@ namespace Coopetition
                     if (Communities[0].Members[j].Webservice.Reputation < minRep)
                         minRep = Communities[0].Members[j].Webservice.Reputation;
                 }
+
+                for (int j = 0; j < Communities[0].Members.Count; j++)
+                {
+                    totBudget += Communities[0].Members[j].Webservice.Budget;
+                    totRep += Communities[0].Members[j].Webservice.Reputation;
+                    if (Communities[0].Members[j].Webservice.Reputation > maxRep)
+                        maxRep = Communities[0].Members[j].Webservice.Reputation;
+                    if (Communities[0].Members[j].Webservice.Reputation < minRep)
+                        minRep = Communities[0].Members[j].Webservice.Reputation;
+                }
+
+                int numberOfTasksDone = 0;
+                double totalQoSDone = 0;
+                int totalSatisfied = 0;
+                for (int j = 0; j < TaskPool.Count; j++)
+                {
+                    if (TaskPool[j].PerformedQoS > 0)
+                    {
+                        numberOfTasksDone++;
+                        totalQoSDone += TaskPool[j].PerformedQoS;
+
+                        if (TaskPool[j].PerformedQoS > TaskPool[j].QoS)
+                        {
+                            totalSatisfied++;
+                        }
+                    }
+                }
+
                 avgBudget.Add((double)totBudget / Communities[0].Members.Count);
                 totalBudget.Add(totBudget);
                 avgReputation.Add((double)totRep / Communities[0].Members.Count);
@@ -470,6 +507,12 @@ namespace Coopetition
                 rewardChance10.Add((double)Communities[0].Members[10].Webservice.NumberOfRewarded / (i + 1));
                 rewardChance15.Add((double)Communities[0].Members[15].Webservice.NumberOfRewarded / (i + 1));
 
+                totalRunTaskQoS.Add((double)totalQoSDone);
+                totalRunTaskNumber.Add((double)numberOfTasksDone);
+                avergaeProvidedTaskQoS.Add((double)totalQoSDone/numberOfTasksDone);
+                numberOfTaskSatisfied.Add((double)totalSatisfied);
+                ratioOfTaskSatisfied.Add((double)totalSatisfied/numberOfTasksDone);               
+
                 ReleaseTasks();
             }
             long end = DateTime.Now.Ticks;
@@ -483,6 +526,20 @@ namespace Coopetition
             avgReputation.Clear();
             maxReputation.Clear();
             minReputation.Clear();
+            growthFactor5.Clear();
+            growthFactor10.Clear();
+            growthFactor15.Clear();
+            compProb5.Clear();
+            compProb10.Clear();
+            compProb15.Clear();
+            coopProb6.Clear();
+            coopProb11.Clear();
+            coopProb16.Clear();
+            totalRunTaskQoS.Clear();
+            totalRunTaskNumber.Clear();
+            avergaeProvidedTaskQoS.Clear();
+            numberOfTaskSatisfied.Clear();
+            ratioOfTaskSatisfied.Clear();
 
             MessageBox.Show("Done!");
         }
@@ -512,6 +569,11 @@ namespace Coopetition
             excelGraph.createHeaders(grrow, ++grcol, "Reward Chance ws5", "A", "B", 2, true, 10, "n");
             excelGraph.createHeaders(grrow, ++grcol, "Reward Chance ws10", "A", "B", 2, true, 10, "n");
             excelGraph.createHeaders(grrow, ++grcol, "Reward Chance ws15", "A", "B", 2, true, 10, "n");
+            excelGraph.createHeaders(grrow, ++grcol, "1", "A", "B", 2, true, 10, "n");
+            excelGraph.createHeaders(grrow, ++grcol, "1", "A", "B", 2, true, 10, "n");
+            excelGraph.createHeaders(grrow, ++grcol, "1", "A", "B", 2, true, 10, "n");
+            excelGraph.createHeaders(grrow, ++grcol, "Satisfied Talk", "A", "B", 2, true, 10, "n");
+            excelGraph.createHeaders(grrow, ++grcol, "Satisfied Ratio", "A", "B", 2, true, 10, "n");
 
             for (int i = 0; i < avgBudget.Count; i++)
             {
@@ -536,6 +598,11 @@ namespace Coopetition
                 excelGraph.InsertData(grrow, ++grcol, rewardChance5[i].ToString(), "", "", "");
                 excelGraph.InsertData(grrow, ++grcol, rewardChance10[i].ToString(), "", "", "");
                 excelGraph.InsertData(grrow, ++grcol, rewardChance15[i].ToString(), "", "", "");
+                excelGraph.InsertData(grrow, ++grcol, totalRunTaskNumber[i].ToString(), "", "", "");
+                excelGraph.InsertData(grrow, ++grcol, totalRunTaskQoS[i].ToString(), "", "", "");
+                excelGraph.InsertData(grrow, ++grcol, avergaeProvidedTaskQoS[i].ToString(), "", "", "");
+                excelGraph.InsertData(grrow, ++grcol, numberOfTaskSatisfied[i].ToString(), "", "", "");
+                excelGraph.InsertData(grrow, ++grcol, ratioOfTaskSatisfied[i].ToString(), "", "", "");     
             }
 
             long ticks = DateTime.Now.Ticks;

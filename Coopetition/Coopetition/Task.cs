@@ -12,6 +12,7 @@ namespace Coopetition
         private double qos;
         private int fee;
         private bool assigned;
+        private double performedqos;
 
         public int Id 
         {
@@ -37,6 +38,12 @@ namespace Coopetition
             set { assigned = value; } 
         }
 
+        public double PerformedQoS
+        {
+            get { return performedqos; }
+            set { performedqos = value; }
+        }
+
         public Task()
         { }
 
@@ -50,6 +57,7 @@ namespace Coopetition
             //fee = rnd.Next(Constants.TaskFee_LowerBound, Constants.TaskFee_UpperBound);
             fee = Constants.TaskFee_LowerBound + (int)((Constants.TaskFee_UpperBound - Constants.TaskFee_LowerBound) * ((qos - Constants.TaskQoS_LowerBound) / (Constants.TaskQoS_UpperBound - Constants.TaskQoS_LowerBound)));
             assigned = false;
+            performedqos = 0;
         }
     }
 }
