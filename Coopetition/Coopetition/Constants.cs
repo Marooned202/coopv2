@@ -34,13 +34,13 @@ namespace Coopetition
         public static int NumberOfUsers = 1000;
         public static int NumberOfTasks = 2500;
         public static int NumberOfRuns = 50; // 50
-        public static int MaxNumberOfTasksPerRun = 32;
-        public static int MinNumberOfTasksPerRun = 30;
+        public static int MaxNumberOfTasksPerRun = 15;
+        public static int MinNumberOfTasksPerRun = 14;
 
         public static double CoopetitiveWebservicesPercentage = 0.6;
 
-        public static double CompetitionThreshold = 0.46;
-        public static int MembershipFee = 3; // was 1
+        public static double CompetitionThreshold = 0.44;
+        public static int MembershipFee = 2; // was 1
         public static double reputationDecay = 0.008;
         public static double CooperationFeePercentage = 0.2;
         public static double CompetitionProbability = 0.5;
