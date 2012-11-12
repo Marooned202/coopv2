@@ -302,8 +302,8 @@ namespace Coopetition
 
             if (this.Type == Constants.WebserviceType.Random) {
                 Random rnd = new Random();
-                if (rnd.NextDouble() > 0.9)
-                    this.budget--;
+                //if (rnd.NextDouble() > 0.9)
+                //    this.budget++;
             }
             if (this.Type == Constants.WebserviceType.Coopetitive)
             {
@@ -317,6 +317,16 @@ namespace Coopetition
                 if (rnd.NextDouble() > 0.5)
                     this.budget--;
             }
+            /*
+            if (this.Type == Constants.WebserviceType.Coopetitive)
+            {
+                Random rnd = new Random();
+                if (rnd.NextDouble() > 0.98)
+                    this.budget -= 18;
+                if (rnd.NextDouble() > 0.80)
+                    this.budget -= 1;
+            }
+             */
         }
 
         private void Collaborate(Task task, CollaborationNetwork network, Community cm)

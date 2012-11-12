@@ -40,7 +40,7 @@ namespace Coopetition
         public static double CoopetitiveWebservicesPercentage = 0.6;
 
         public static double CompetitionThreshold = 0.44;
-        public static int MembershipFee = 2; // was 1
+        public static int MembershipFee = 3; // was 1
         public static double reputationDecay = 0.008;
         public static double CooperationFeePercentage = 0.2;
         public static double CompetitionProbability = 0.5;

@@ -482,7 +482,7 @@ namespace Coopetition
                         numberOfTasksDone++;
                         totalQoSDone += TaskPool[j].PerformedQoS;
 
-                        if (TaskPool[j].PerformedQoS > TaskPool[j].QoS)
+                        if (TaskPool[j].PerformedQoS > TaskPool[j].QoS + 0.2)
                         {
                             totalSatisfied++;
                         }
